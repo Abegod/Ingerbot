@@ -41,10 +41,10 @@ client.on("message", (message) => {
         const replies = 5;
         const chosenReply = Math.floor(Math.random() * replies) + 1;
 
-        if (args == 0) {
+        if (args.length == 0) {
             message.reply('Hvad er det jeg skal jeg vælge..?');
             return;
-        } else if(pickArgs == 1) {
+        } else if(pickArgs.length == 1) {
             message.reply('Du har kun givet mig én valgmulighed. Adskil dem med kommaer');
             return;
         }
