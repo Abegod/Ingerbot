@@ -41,7 +41,7 @@ client.on("message", (message) => {
         const replies = 5;
         const chosenReply = Math.floor(Math.random() * replies) + 1;
 
-        if (pickArgs == 0) {
+        if (args == 0) {
             message.reply('Hvad er det jeg skal jeg vælge..?');
             return;
         } else if(pickArgs == 1) {
