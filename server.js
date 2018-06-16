@@ -38,7 +38,7 @@ client.on("message", (message) => {
         const pickArgs = args.join(" ").split(",");
         const randomArg = Math.floor(Math.random() * pickArgs.length);
         const chosenArg = pickArgs[randomArg].trim();
-        const replies = 5;
+        const replies = 7;
         const chosenReply = Math.floor(Math.random() * replies) + 1;
 
         if (args.length == 0) {
@@ -63,6 +63,12 @@ client.on("message", (message) => {
                 break;
             case 5:
                 message.reply("Jeg tror " + chosenArg + " er bedst for dig i dag.");
+                break;
+			case 6:
+                message.reply("Hælder mest til " + chosenArg);
+                break;
+			case 7:
+                message.reply("Hmm den er svær. Det bliver nok " + chosenArg);
                 break;
         }
     }
