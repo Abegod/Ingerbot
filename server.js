@@ -38,10 +38,14 @@ const NarkoSchema = new Schema({
 const Narko = mongoose.model('Narko', NarkoSchema);
 
 
+var timeOutVar;
+
 function clearNarkoDB() {
     Narko.deleteMany(function (err){ if (err) return handleError(err);});
+    timeOutVar = setTimeout(clearNarkoDB, 86400000);
 }
-setInterval(clearNarkoDB, 86400000);
+
+
 
 let prefix = "!";
 
@@ -49,6 +53,10 @@ client.on("message", (message) => {
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
 
+    if(command === 'set' && message.author.id == 445345325671251998) {
+        clearTimeout(timeOutVar);
+        setTimeout(clearNarkoDB, args);
+    }
     if (command === "pick") {
         const pickArgs = args.join(" ").split(",");
         const randomArg = Math.floor(Math.random() * pickArgs.length);
@@ -132,7 +140,7 @@ client.on("message", (message) => {
         var temp = args.join(" ");
         
         if (temp != "") {
-            var narkoArg = ('**').concat(temp).concat('** *(' + n(toLocalTime(now.getTime()).getHours()) + ':' + n(toLocalTime(now.getTime()).getMinutes()) + ')*');
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(toLocalTime(now.getTime()).getUTCHours()) + ':' + n(toLocalTime(now.getTime()).getUTCMinutes()) + ')*');
         } else {
             var narkoArg = "";
         }
