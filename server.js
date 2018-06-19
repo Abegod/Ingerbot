@@ -127,12 +127,6 @@ client.on("message", (message) => {
         }
     }
     else if(command === 'narko'){
-        var toLocalTime = function(time) {
-            var d = new Date(time);
-            var offset = (new Date().getTimezoneOffset() / 60) * -1;
-            var n = new Date(d.getTime() + offset);
-            return n;
-        };
         function n(n){
             return n > 9 ? "" + n: "0" + n;
         }
@@ -140,7 +134,7 @@ client.on("message", (message) => {
         var temp = args.join(" ");
         
         if (temp != "") {
-            var narkoArg = ('**').concat(temp).concat('** *(' + n(toLocalTime(now.getTime()).getUTCHours()) + ':' + n(toLocalTime(now.getTime()).getUTCMinutes()) + ')*');
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getHours()) + ':' + n(toLocalTime(now.getMinutes()) + ')*');
         } else {
             var narkoArg = "";
         }
