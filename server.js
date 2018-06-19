@@ -22,11 +22,22 @@ mongoose.connection.once('open', function() {
 }).on('error', function(error){
     console.log('Connection error', error);
 });
+
+
 const Schema = mongoose.Schema;
+
 const RaffleSchema = new Schema({
     content: String
 });
 const RaffleTicket = mongoose.model('RaffleTicket', RaffleSchema);
+
+const NarkoSchema = new Schema({
+    userID: String,
+    additions: Array
+});
+const Narko = mongoose.model('Narko', NarkoSchema);
+
+
 
 let prefix = "!";
 
@@ -38,7 +49,7 @@ client.on("message", (message) => {
         const pickArgs = args.join(" ").split(",");
         const randomArg = Math.floor(Math.random() * pickArgs.length);
         const chosenArg = pickArgs[randomArg].trim();
-        const replies = 7;
+        const replies = 5;
         const chosenReply = Math.floor(Math.random() * replies) + 1;
 
         if (args.length == 0) {
@@ -63,12 +74,6 @@ client.on("message", (message) => {
                 break;
             case 5:
                 message.reply("Jeg tror " + chosenArg + " er bedst for dig i dag.");
-                break;
-			case 6:
-                message.reply("Hælder mest til " + chosenArg);
-                break;
-			case 7:
-                message.reply("Hmm den er svær. Det bliver nok " + chosenArg);
                 break;
         }
     }
@@ -97,7 +102,7 @@ client.on("message", (message) => {
                 RaffleTicket.findOne().skip(random).exec(
                   function (err, result) {
                     console.log(result);
-                    message.reply('Tillykke, du har vundet ' + result.content + '!');
+                    message.reply('Tillykke, du har vundet en ' + result.content + '!');
                   })
               })
         } else {
@@ -109,21 +114,100 @@ client.on("message", (message) => {
             });
         }
     }
+    else if(command === 'narko'){
+        function n(n){
+            return n > 9 ? "" + n: "0" + n;
+        }
+        var now = new Date();
+        var temp = args.join(" ");
+        
+        if (temp != "") {
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getUTCHours()+2) + ':' + n(now.getUTCMinutes()) + ')*');
+        } else {
+            var narkoArg = "";
+        }
+
+
+        var authorID = message.author.id;
+
+        var replyStart = 'dine tilføjelser i dag: ';
+        var replyIngenting = replyStart + 'ingenting';
+
+        Narko.count({ userID: authorID}, function (err, count) {
+            if (err) return handleError(err);
+
+            if(count == 0) {
+                var firstNarkoArray;
+                if (narkoArg == "") {
+                    firstNarkoArray = [];
+                    message.reply(replyIngenting);
+                } else {
+                    firstNarkoArray = [narkoArg];
+                    message.reply(replyStart + narkoArg);
+                } 
+                var newNarko = new Narko({userID: authorID, additions: firstNarkoArray});
+                newNarko.save(function (err) {
+                    if (err) return console.error(err);
+                });
+            } 
+            else {
+                Narko.findOne({userID: authorID}, function (err, narko) {   
+                    if (err) return handleError(err);
+                    if (narkoArg != "") {
+                        Narko.findOneAndUpdate({userID: authorID}, {$push: {additions: narkoArg}}, {safe: true, upsert: true},function(err, doc) {if(err) console.log(err);});
+                        if (narko.additions.length == 0) {
+                            message.reply(replyStart + narkoArg);
+                        }  else {
+                            var additionsString = narko.additions.join(", ");
+                            message.reply(replyStart + additionsString + ', ' + narkoArg);
+                        }
+                    }  
+                    else {
+                        if (narko.additions.length == 0) {
+                            message.reply(replyStart + 'ingenting');
+                        } 
+                        else {
+                            var additionsString = narko.additions.join(", ");
+                            message.reply(replyStart + additionsString);
+                        }
+                    }
+                            
+                });
+            }            
+        });
+    }
     else if(message.isMentioned(client.user)){
         var replies = [
-            'er du dansker? For det er du bestemt ikke i mine øjne, din usle narkoman',
+            'sikke du tisser, Else',
             '2 sek, ruller lige',
             'lol hvad? fuck jeg er basket..',
             'dig og mig, my place, nu! og husk sagerne',
-            'tag mig din tyr, tag mig lige nu og her! please PLEASE!!!',
+            ':)',
             'SKRID',
             'hey snuske, kom herhen til mor <3',
             'ses vi til Sommersang I Mariehaven?',
             'åårrh... åhhhh.. åh åh ÅÅH AAAH AAAARRRRRRHHHHHHHHHHH!! ... puha',
-            'flat earthere har faktisk en pointe'
+            'flat earthere har faktisk en pointe',
+            'jeg er bestemt ikke nogen so',
+            'jaja, det siger du jo'
             ];
             const chosenReply = Math.floor(Math.random() * replies.length);
             message.reply(replies[chosenReply]);
+    }
+    else if (command === "time"){
+        function n(n){
+            return n > 9 ? "" + n: "0" + n;
+        }
+        var no = new Date();
+
+        var toLocalTime = function(time) {
+            var d = new Date(time);
+            var offset = (new Date().getTimezoneOffset() / 60) * -1;
+            var n = new Date(d.getTime() + offset);
+            return n;
+        };
+        message.reply( n(toLocalTime(no.getTime()).getHours()) + ':' + n(toLocalTime(no.getTime()).getMinutes()));
+        
     }
   });
 
