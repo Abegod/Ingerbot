@@ -134,7 +134,7 @@ client.on("message", (message) => {
         var temp = args.join(" ");
         
         if (temp != "") {
-            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getHours()) + ':' + n(toLocalTime(now.getMinutes()) + ')*'));
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getHours()) + ':' + n(now.getMinutes()) + ')*');
         } else {
             var narkoArg = "";
         }
