@@ -38,6 +38,10 @@ const NarkoSchema = new Schema({
 const Narko = mongoose.model('Narko', NarkoSchema);
 
 
+function clearNarkoDB() {
+    Narko.deleteMany(function (err){ if (err) return handleError(err);});
+}
+setInterval(clearNarkoDB, 86400000);
 
 let prefix = "!";
 
@@ -115,6 +119,12 @@ client.on("message", (message) => {
         }
     }
     else if(command === 'narko'){
+        var toLocalTime = function(time) {
+            var d = new Date(time);
+            var offset = (new Date().getTimezoneOffset() / 60) * -1;
+            var n = new Date(d.getTime() + offset);
+            return n;
+        };
         function n(n){
             return n > 9 ? "" + n: "0" + n;
         }
@@ -122,12 +132,10 @@ client.on("message", (message) => {
         var temp = args.join(" ");
         
         if (temp != "") {
-            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getUTCHours()+2) + ':' + n(now.getUTCMinutes()) + ')*');
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(toLocalTime(now.getTime()).getHours()) + ':' + n(toLocalTime(now.getTime()).getMinutes()) + ')*');
         } else {
             var narkoArg = "";
         }
-
-
         var authorID = message.author.id;
 
         var replyStart = 'dine tilføjelser i dag: ';
@@ -194,21 +202,7 @@ client.on("message", (message) => {
             const chosenReply = Math.floor(Math.random() * replies.length);
             message.reply(replies[chosenReply]);
     }
-    else if (command === "time"){
-        function n(n){
-            return n > 9 ? "" + n: "0" + n;
-        }
-        var no = new Date();
 
-        var toLocalTime = function(time) {
-            var d = new Date(time);
-            var offset = (new Date().getTimezoneOffset() / 60) * -1;
-            var n = new Date(d.getTime() + offset);
-            return n;
-        };
-        message.reply( n(toLocalTime(no.getTime()).getHours()) + ':' + n(toLocalTime(no.getTime()).getMinutes()));
-        
-    }
   });
 
 
