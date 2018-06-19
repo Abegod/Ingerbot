@@ -133,8 +133,15 @@ client.on("message", (message) => {
         var now = new Date();
         var temp = args.join(" ");
         
+        var toLocalTime = function(time) {
+            var d = new Date(time);
+            var offset = (new Date().getTimezoneOffset() / 60) * -1;
+            var n = new Date(d.getTime() + offset);
+            return n;
+        };
+
         if (temp != "") {
-            var narkoArg = ('**').concat(temp).concat('** *(' + n(now.getUTCHours()) + ':' + n(now.getUTCMinutes()) + ')*');
+            var narkoArg = ('**').concat(temp).concat('** *(' + n(toLocalTime(now.getTime()).getHours()) + ':' + n(toLocalTime(now.getTime()).getMinutes()) + ')*');
         } else {
             var narkoArg = "";
         }
