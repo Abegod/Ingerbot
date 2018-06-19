@@ -114,7 +114,7 @@ client.on("message", (message) => {
                 RaffleTicket.findOne().skip(random).exec(
                   function (err, result) {
                     console.log(result);
-                    message.reply('Tillykke, du har vundet en ' + result.content + '!');
+                    message.reply('Tillykke, du har vundet ' + result.content + '!');
                   })
               })
         } else {
