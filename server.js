@@ -37,6 +37,10 @@ const NarkoSchema = new Schema({
 });
 const Narko = mongoose.model('Narko', NarkoSchema);
 
+client.on('disconnect', function(erMsg, code) {
+    console.log('----- Bot disconnected from Discord with code', code, 'for reason:', erMsg, '-----');
+    client.connect();
+});
 
 var timeOutVar;
 
@@ -44,8 +48,6 @@ function clearNarkoDB() {
     Narko.deleteMany(function (err){ if (err) return handleError(err);});
     timeOutVar = setTimeout(clearNarkoDB, 86400000);
 }
-
-
 
 let prefix = "!";
 
@@ -127,7 +129,7 @@ client.on("message", (message) => {
         }
     }
     else if(command === 'narko'){
-	var temp = args.join(" ");
+        var temp = args.join(" ");
 
         function n(n){
             return n > 9 ? "" + n: "0" + n;
@@ -204,7 +206,8 @@ client.on("message", (message) => {
             'åårrh... åhhhh.. åh åh ÅÅH AAAH AAAARRRRRRHHHHHHHHHHH!! ... puha',
             'flat earthere har faktisk en pointe',
             'jeg er bestemt ikke nogen so',
-            'jaja, det siger du jo'
+            'jaja, det siger du jo',
+			'Sut min *******************!'
             ];
             const chosenReply = Math.floor(Math.random() * replies.length);
             message.reply(replies[chosenReply]);
