@@ -52,6 +52,8 @@ function clearNarkoDB() {
 let prefix = "!";
 
 client.on("message", (message) => {
+    if(message.author.bot) return;
+
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
 
@@ -147,12 +149,39 @@ client.on("message", (message) => {
         }
         var authorID = message.author.id;
 
+
+        //Anden bruger nævnt
+        var mention = message.mentions.members.first();
+        if (mention && temp.trim() == mention){
+            var replyStart = mention + 's tilføjelser i dag: ';
+            var replyIngenting = replyStart + 'ingenting';
+
+            Narko.count({ userID: mention.id}, function (err, count) {
+                if (err) return handleError(err);
+
+                if(count == 0) {
+                    message.channel.send(replyIngenting);
+                } else {
+                    Narko.findOne({userID: mention.id}, function (err, narko) {   
+                        if (err) return handleError(err);
+                        if (narko.additions.length == 0) {
+                            message.channel.send(replyIngenting);
+                        } else {
+                            message.channel.send(replyStart + narko.additions.join(", ") );
+                        }
+                    });
+                }
+            });
+        }
+        else {
         var replyStart = 'dine tilføjelser i dag: ';
         var replyIngenting = replyStart + 'ingenting';
-
         Narko.count({ userID: authorID}, function (err, count) {
-            if (err) return handleError(err);
+            if (err) return handleError(err);            
 
+            
+
+            //Hvis der er dagens første !narko
             if(count == 0) {
                 var firstNarkoArray;
                 if (narkoArg == "") {
@@ -167,9 +196,11 @@ client.on("message", (message) => {
                     if (err) return console.error(err);
                 });
             } 
+            //Hvis det ikke er..
             else {
                 Narko.findOne({userID: authorID}, function (err, narko) {   
                     if (err) return handleError(err);
+                    //Hvis der skal uploades til db
                     if (narkoArg != "") {
                         Narko.findOneAndUpdate({userID: authorID}, {$push: {additions: narkoArg}}, {safe: true, upsert: true},function(err, doc) {if(err) console.log(err);});
                         if (narko.additions.length == 0) {
@@ -179,6 +210,7 @@ client.on("message", (message) => {
                             message.reply(replyStart + additionsString + ', ' + narkoArg);
                         }
                     }  
+                    //Hvis der kun skal vises ting
                     else {
                         if (narko.additions.length == 0) {
                             message.reply(replyStart + 'ingenting');
@@ -192,10 +224,11 @@ client.on("message", (message) => {
                 });
             }            
         });
+        }
     }
     else if(message.isMentioned(client.user)){
         var replies = [
-            'sikke du tisser, Else',
+            'ingerstøjbot bliver til isbjørnetogt ',
             '2 sek, ruller lige',
             'lol hvad? fuck jeg er basket..',
             'dig og mig, my place, nu! og husk sagerne',
@@ -207,7 +240,11 @@ client.on("message", (message) => {
             'flat earthere har faktisk en pointe',
             'jeg er bestemt ikke nogen so',
             'jaja, det siger du jo',
-			'Sut min *******************!'
+            'jeg er en pilotiker',
+            'jeg rammer k-hullet, du rammer inger-hullet, ok?',
+            'Sut min *******************!',
+            'du vild nok bro',
+            'fuck jeres pussy drug combos, prøv microlax + viagra så skal du se lol'
             ];
             const chosenReply = Math.floor(Math.random() * replies.length);
             message.reply(replies[chosenReply]);
